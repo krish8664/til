@@ -18,24 +18,25 @@
 
 ## Functions
 
-   ### Multiclause functions
-   ```haskell
-   sumTill 1 = 1
-   sumTill n = n + sumTill (n - 1)
-   ```
+### Multiclause functions
+```haskell
+sumTill 1 = 1
+sumTill n = n + sumTill (n - 1)
+```
 
-   ### Guard Functions
-   ```haskell
-   sumTill' n
-    | n == 1 = 1
-    | otherwise = n + sumTill' (n - 1)
-    ```
-    ### Case exression
-    ```haskell
-    sumTill'' x = case of
-      1 -> 1
-      _ -> x + sumTill'' (x - 1)
-    ```
+### Guard Functions
+```haskell
+sumTill' n
+ | n == 1 = 1
+ | otherwise = n + sumTill' (n - 1)
+```
+### Case exression
+```haskell
+sumTill'' x = case of
+ 1 -> 1
+ _ -> x + sumTill'' (x - 1)
+```
+
 ## List comprehension
 
 ```haskell
