@@ -24,11 +24,7 @@ user=> (-> 2
 	   (* 5))
 15
 ```
-Woh! This is a lot simpler to read (at least for me)!
-
-So what happens here is the thread first macro just takes the 2 and then pass it as the first argument to the next funtion and then the result of that as the first argument to the next and so on.
-
-Thread last does something similar, insted of passing it as the first argument it would pass it as the last argument. So if you where to apply the `->>` to the previous example you would get
+Woh! This is a lot simpler to read (at least for me)! So what happens here is the thread first macro just takes the 2 and then pass it as the first argument to the next funtion and then the result of that as the first argument to the next and so on. Thread last does something similar, insted of passing it as the first argument it would pass it as the last argument. So if you where to apply the `->>` to the previous example you would get
 
 ```clojure
 user=> (->> 2
@@ -45,39 +41,9 @@ user=> (* 5 (+ 4 (- 3 (/ 1 2))))
 65/2
 ```
 
-Here are some other examples from the [Clojure Docs](http://clojuredocs.org).
-```clojure
-user=> (first (.split (.replace (.toUpperCase "a b c d") "A" "X") " "))
-"X"
-
-user=> (-> "a b c d"
-           .toUpperCase
-           (.replace "A" "X")
-           (.split " ")
-           first)
-"X"
-
-user=> (reduce +
-               (take 10
-                     (filter even?
-                             (map #(* % %)
-                                  (range)))))
-1140
-
-user=> (->> (range)
-            (map #(* % %))
-            (filter even?)
-            (take 10)
-            (reduce +))
-1140
-```
-
-This makes the code easier to read and we don't see a single huge line or functions with countless number of paranthesis around them.
-
-My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier.
-
-The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
+My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier. The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
 For exmaple you want to do stuff to a collection in clojure.
+
 ```clojure
 (def x {:document
 	{:paragraph
@@ -87,39 +53,24 @@ For exmaple you want to do stuff to a collection in clojure.
 ```
 Now you want to add new a `\n` at the end of each line and then print them as a string. How would you do this ? Well its easy, you just get the text and then apply map and reduce to it and then print. Let's write it shall we ?
 ```clojure
-user=> (println (reduce str (map #(str % "\n") (:text (:paragraph (:document x))))))
-This is the first line.
-This is the second line.
-This is the third line
-
-nil
+(println (reduce str (map #(str % "\n") (:text (:paragraph (:document x))))))
 ```
 Now lets take a look at this if we decide to write it using thread last macro
 ```clojure
-user=> (->> x
-       	    :document :paragraph :text
-       	    (map #(str % "\n"))
-	    (reduce str)
-	    println)
-This is the first line.
-This is the second line.
-This is the third line
-
-nil
+(->> x
+     :document :paragraph :text
+     (map #(str % "\n"))
+     (reduce str)
+     println)
 ```
-It's a lot more cleaner, and you don't have to keep matching the paranthesis to actually figure out what is happening. This works even better when you want to do a lot more transformation on the collections.
+It's a lot more cleaner, and you don't have to keep matching the parenthesis to actually figure out what is happening. This works even better when you want to do a lot more transformation on the collections.
 
 While at it, we can make use of this neat function `get-in` that helps you get values from deep inside a map, which is somewhat better to use at times. The advantage of useing `get-in` over the therading would be that it helps you supply a `not-found` value, the would be returned if the key you are looking for is not there in the collection. Pretty neat huh ? Lets try that.
 ```clojure
-user=> (->> (get-in x [:document :paragraph :text] ["No text found"])
-   	    (map #(str % "\n"))
-	    (reduce str)
-	    println)
-This is the first line.
-This is the second line.
-This is the third line
-
-nil
+(->> (get-in x [:document :paragraph :text] ["No text found"])
+     (map #(str % "\n"))
+     (reduce str)
+     println)
 ```
 Choose which ever works for you.
 
