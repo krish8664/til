@@ -44,7 +44,10 @@ user=> (* 5 (+ 4 (- 3 (/ 1 2))))
 ```
 
 ## Objects and collections
-My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier. The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
+My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier.
+
+### Collections
+The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
 For exmaple you want to do stuff to a collection in clojure.
 
 ```clojure
@@ -77,6 +80,7 @@ While at it, we can make use of this neat function `get-in` that helps you get v
 ```
 Choose which ever works for you.
 
+### Objects
 Now if you are working with java interop and you aren't using the thread-first macro, then this might change your mind.
 Now let's take this example, where you have this java object and you want apply a set of methods on the javaobject. This is how you would be doing it.
 ```clojure
