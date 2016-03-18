@@ -1,15 +1,15 @@
 # Threading macros in clojure, the -> and ->> thingy
 
-A few days into learning clojure, I thought it would be a good idea to look at some actual clojure projects in github. I was feeling all confident and what not - you know getting used to lispy way of writing things. The puspose of going through some code, was to get a gist of what was going on in the code, if not understanding it fully. I guess you already know where this is going don't you ? Yep, I find myself reading through code and i find these two, `->` and `->>` (and a lot more of *scary* stuff) staring at me, and I had no clue what to make of it. I guess there would at least be a few of you guys who felt the same. Hence the blogpost.
+A few days into learning clojure, I thought it would be a good idea to look at some actual clojure projects in github. I was feeling all confident and what not - you know getting used to lispy way of writing things. The puspose of going through some code, was to get a gist of what was going on in the code, if not understanding it fully. I guess you already know where this is going don't you ? Yep, I find myself reading through code and I find these two, `->` and `->>` (and a lot more of *scary* stuff) staring at me, and I had no clue what to make of it. I guess there would at least be a few of you guys who felt the same.
 
-So first things first, what are they called ? Apparently, the threading macros. `->` is the thread first and `->>` thread last macros. What do these do ? Well they are just macros that add syntactical sugar to your code. It makes reading/writing code easier. Meh! Just that ? -you ask. Lets see.
+Apparently, they are called threading macros. `->` is the thread first and `->>` thread last macros, and they are syntactical sugar to your code. It makes reading/writing code easier. Meh! Just that ? -you ask. Lets see.
 
 The syntax goes something like this : [`(-> x & forms)`](http://clojuredocs.org/clojure.core/-%3E) and [`(->> x & forms)`](http://clojuredocs.org/clojure.core/-%3E%3E). The following examples might help you understand it.
 
 Let say you want to do this (divide 2 by 1 then subtract 3 then add 4 and multiply with 5). How would you write it in clojure?
 
 ```clojure
-user>(* (+ (- (/ 2 1) 3) 4 )5)
+user=> (* (+ (- (/ 2 1) 3) 4 )5)
 15
 ```
 Boy! It can get difficult to read when you have a bunch of these strung together.
@@ -17,58 +17,143 @@ Boy! It can get difficult to read when you have a bunch of these strung together
 Now lets see how we write it with `->`
 
 ```clojure
-user>(-> 2 (/ 1) (- 3) (+ 4) (* 5))
+user=> (-> 2
+	   (/ 1)
+	   (- 3)
+	   (+ 4)
+	   (* 5))
 15
 ```
 Woh! This is a lot simpler to read (at least for me)!
 
 So what happens here is the thread first macro just takes the 2 and then pass it as the first argument to the next funtion and then the result of that as the first argument to the next and so on.
 
-Thread last does something similar, insted of passing it as the first argument it would pass it as the second argument. So if you where to apply the `->>` to the previous example you would get
+Thread last does something similar, insted of passing it as the first argument it would pass it as the last argument. So if you where to apply the `->>` to the previous example you would get
 
 ```clojure
-user>(->> 2 (/ 1) (- 3) (+ 4) (* 5))
+user=> (->> 2
+	    (/ 1)
+	    (- 3)
+	    (+ 4)
+	    (* 5))
 65/2
 ```
 
 which is
 ```clojure
-user>(* 5 (+ 4 (- 3 (/ 1 2))))
+user=> (* 5 (+ 4 (- 3 (/ 1 2))))
 65/2
 ```
 
-These help you a lot when having to write code with a lot of functions (wrting almost any clojure?). The best part of this is when dealing with collections and java interops (doing java stuff in clojure). It just makes the code look a lot cleaner.
+Here are some other examples from the [Clojure Docs](http://clojuredocs.org).
+```clojure
+user=> (first (.split (.replace (.toUpperCase "a b c d") "A" "X") " "))
+"X"
 
-Lets take another example. Here we some java code [(To create a docx using doc4j lib)](http://blog.iprofs.nl/2012/09/06/creating-word-documents-with-docx4j/), for which we would like to write a java interop in clojure
-```java
-WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage();
-wordMLPackage.getMainDocumentPart().addParagraphOfText("Hello Word!");
-wordMLPackage.save(new java.io.File("src/main/files/HelloWord1.docx"));
-```
-Clojure without threading operator
-```clojure
-(let [pkg (WordprocessingMLPackage/createPackage)]
-  (.addParagraphOfText (.getMainDocumentPart pkg) "Hello World!")
-  (.save pkg (file docx-file)))
-```
-Clojure with threading operator
-```clojure
-(let [pkg (WordprocessingMLPackage/createPackage)]
-  (-> pkg (.getMainDocumentPart) (.addParagraphOfText "Hello World!"))
-  (-> pkg (.save (file docx-file))))
+user=> (-> "a b c d"
+           .toUpperCase
+           (.replace "A" "X")
+           (.split " ")
+           first)
+"X"
+
+user=> (reduce +
+               (take 10
+                     (filter even?
+                             (map #(* % %)
+                                  (range)))))
+1140
+
+user=> (->> (range)
+            (map #(* % %))
+            (filter even?)
+            (take 10)
+            (reduce +))
+1140
 ```
 
-Oh ! And these are very helpful getting stuff out of your nested maps.
+This makes the code easier to read and we don't see a single huge line or functions with countless number of paranthesis around them.
+
+My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier.
+
+The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
+For exmaple you want to do stuff to a collection in clojure.
 ```clojure
-user>(def x {:a {:b {:c {:d {:e "foobar"}}}}})
-user>(->> x :a :b :c :d :e)
-"foobar"
-user>(-> x :a :b :c :d :e)
-"foobar"
+(def x {:document
+	{:paragraph
+	 {:text ["This is the first line"
+	 	 "This is the second line"
+		 "This is the third line"]}}})
 ```
-instead of you know
+Now you want to add new a `\n` at the end of each line and then print them as a string. How would you do this ? Well its easy, you just get the text and then apply map and reduce to it and then print. Let's write it shall we ?
 ```clojure
-user>(((((x :a) :b) :c) :d) :e)
-"foobar"
+user=> (println (reduce str (map #(str % "\n") (:text (:paragraph (:document x))))))
+This is the first line.
+This is the second line.
+This is the third line
+
+nil
 ```
-Now you tell me. Would you rather use threading or not.
+Now lets take a look at this if we decide to write it using thread last macro
+```clojure
+user=> (->> x
+       	    :document :paragraph :text
+       	    (map #(str % "\n"))
+	    (reduce str)
+	    println)
+This is the first line.
+This is the second line.
+This is the third line
+
+nil
+```
+It's a lot more cleaner, and you don't have to keep matching the paranthesis to actually figure out what is happening. This works even better when you want to do a lot more transformation on the collections.
+
+While at it, we can make use of this neat function `get-in` that helps you get values from deep inside a map, which is somewhat better to use at times. The advantage of useing `get-in` over the therading would be that it helps you supply a `not-found` value, the would be returned if the key you are looking for is not there in the collection. Pretty neat huh ? Lets try that.
+```clojure
+user=> (->> (get-in x [:document :paragraph :text] ["No text found"])
+   	    (map #(str % "\n"))
+	    (reduce str)
+	    println)
+This is the first line.
+This is the second line.
+This is the third line
+
+nil
+```
+Choose which ever works for you.
+
+Now if you are working with java interop and you aren't using the thread-first macro, then this might change your mind.
+Now let's take this example, where you have this java object and you want apply a set of methods on the javaobject. This is how you would be doing it.
+```clojure
+(.add (.getContent (.getBody (.getJaxbelement (.getMaindocumentpart (Wordprocessingmlpackage/createPackage)))) paragraph)
+```
+Now with thread first this becomes
+```clojure
+(-> (WordprocessingMLPackage/createPackage)
+    .getMainDocumentPart
+    .getJaxbElement
+    .getBody
+    .getContent
+    (.add paragraph)
+```
+Which is way more easier to read, and write.
+
+Since we are at it, let us talk about another function `doto`. This is very helpful when you have to apply multiple funtions on a single java object. We didn't use it in the previous example because, each of the function was returing a different object.
+
+Consider you have a table-border object and you want to set border to it. This is how you would be writing with thread the `doto` funtion.
+```clojure
+(defn set-table-border
+  [table-border border]
+  (doto table-border
+    (.setBottom border)
+    (.setTop border)
+    (.setRight border)
+    (.setLeft border)
+    (.setInsideH border)
+    (.setInsideV border)))
+```
+You could use the threading operator or even write it in a single line, but it would be messy.
+
+
+This pretty much sums up this blogpost.
