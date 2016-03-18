@@ -8,6 +8,7 @@ The syntax goes something like this : [`(-> x & forms)`](http://clojuredocs.org/
 
 Let say you want to do this (divide 2 by 1 then subtract 3 then add 4 and multiply with 5). How would you write it in clojure?
 
+## ->
 ```clojure
 user=> (* (+ (- (/ 2 1) 3) 4 )5)
 15
@@ -24,8 +25,10 @@ user=> (-> 2
 	   (* 5))
 15
 ```
-Woh! This is a lot simpler to read (at least for me)! So what happens here is the thread first macro just takes the 2 and then pass it as the first argument to the next funtion and then the result of that as the first argument to the next and so on. Thread last does something similar, insted of passing it as the first argument it would pass it as the last argument. So if you where to apply the `->>` to the previous example you would get
+Woh! This is a lot simpler to read (at least for me)! So what happens here is the thread first macro just takes the 2 and then pass it as the first argument to the next funtion and then the result of that as the first argument to the next and so on.
 
+## ->>
+Thread last does something similar, insted of passing it as the first argument it would pass it as the last argument. So if you where to apply the `->>` to the previous example you would get
 ```clojure
 user=> (->> 2
 	    (/ 1)
@@ -34,13 +37,13 @@ user=> (->> 2
 	    (* 5))
 65/2
 ```
-
 which is
 ```clojure
 user=> (* 5 (+ 4 (- 3 (/ 1 2))))
 65/2
 ```
 
+## Objects and collections
 My favorite use of the threading macros has been when I have used them with java/clojure data structures. It makes handeling them a lot easier. The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
 For exmaple you want to do stuff to a collection in clojure.
 
