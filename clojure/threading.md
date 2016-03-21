@@ -82,7 +82,7 @@ Choose which ever works for you.
 
 ### Objects
 Now if you are working with java interop and you aren't using the thread-first macro, then this might change your mind.
-Now let's take this example, where you have this java object and you want apply a set of methods on the javaobject. This is how you would be doing it.
+Let's take this example, where you have a java object and you apply a series of methods on the javaobject or javaobjects returned on applying these methods. This is how you would be doing it.
 ```clojure
 (.add (.getContent (.getBody (.getJaxbelement (.getMaindocumentpart (Wordprocessingmlpackage/createPackage)))) paragraph)
 ```
@@ -95,7 +95,7 @@ Now with thread first this becomes
     .getContent
     (.add paragraph)
 ```
-Which is way more easier to read, and write.
+Which is way more easier to read, and write. It is aligned with the original java representation, which aids in better understanding of the code. It feels like clunkier and neater than the preious case where you could get lost in all those parenthesis.
 
 Since we are at it, let us talk about another function `doto`. This is very helpful when you have to apply multiple funtions on a single java object. We didn't use it in the previous example because, each of the function was returing a different object.
 
