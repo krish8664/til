@@ -1,8 +1,8 @@
 # Threading macros in clojure, the -> and ->> thingy
 
-A few days into learning clojure, I thought it would be a good idea to look at some actual clojure projects in github. I was feeling all confident and what not - you know getting used to lispy way of writing things. The puspose of going through some code, was to get a gist of what was going on in the code, if not understanding it fully. I guess you already know where this is going don't you ? Yep, I find myself reading through code and I find these two, `->` and `->>` (and a lot more of *scary* stuff) staring at me, and I had no clue what to make of it. I guess there would at least be a few of you guys who felt the same.
+A few days into learning clojure, I thought it would be a good idea to look at some actual clojure projects in github. I was feeling all confident and what not - you know getting used to lispy way of writing things. The puspose of going through some code, was to get a gist of what was going on in the code, if not understanding it fully. I guess you already know where this is going don't you ? Yep, I find myself reading through code and I find these two, `->` and `->>` (and a lot more *scary* stuff) staring at me, and I had no clue what to make of it. I guess there would at least be a few of you guys who felt the same.
 
-Apparently, they are called threading macros. `->` is the thread first and `->>` thread last macros, and they are syntactical sugar to your code. It makes reading/writing code easier. Meh! Just that ? -you ask. Lets see.
+Apparently, they are called threading macros. `->` is the thread first and `->>` thread last macros, and they are syntactical sugar to your code. It makes reading/writing code easier. "Meh! Just that?" you ask. Let's see.
 
 The syntax goes something like this : [`(-> x & forms)`](http://clojuredocs.org/clojure.core/-%3E) and [`(->> x & forms)`](http://clojuredocs.org/clojure.core/-%3E%3E). The following examples might help you understand it.
 
@@ -48,8 +48,7 @@ My favorite use of the threading macros has been when I have used them with java
 
 ### Collections
 The thread-last macro `->>` is very usefull in dealing with collections. Where you have to transofrm them or apply functions to them, which is what you might be doing in a lot of your clojure code.
-For exmaple you want to do stuff to a collection in clojure.
-
+For exmaple, if you have this collection:
 ```clojure
 (def x {:document
 	{:paragraph
@@ -57,7 +56,7 @@ For exmaple you want to do stuff to a collection in clojure.
 	 	 "This is the second line"
 		 "This is the third line"]}}})
 ```
-Now you want to add new a `\n` at the end of each line and then print them as a string. How would you do this ? Well its easy, you just get the text and then apply map and reduce to it and then print. Let's write it shall we ?
+Say you want to add a new '\n' at the end of each line and then print them together as a single string. How would you do this? Well its easy, you just get the text and then apply map and reduce to it and then print. Let's write it shall we?
 ```clojure
 (println (reduce str (map #(str % "\n") (:text (:paragraph (:document x))))))
 ```
@@ -71,18 +70,18 @@ Now lets take a look at this if we decide to write it using thread last macro
 ```
 It's a lot more cleaner, and you don't have to keep matching the parenthesis to actually figure out what is happening. This works even better when you want to do a lot more transformation on the collections.
 
-While at it, we can make use of this neat function `get-in` that helps you get values from deep inside a map, which is somewhat better to use at times. The advantage of useing `get-in` over the therading would be that it helps you supply a `not-found` value, the would be returned if the key you are looking for is not there in the collection. Pretty neat huh ? Lets try that.
+While at it, we can make use of this neat function `get-in` that helps you get values from deep inside a map, which is somewhat better to use at times. The advantage of useing `get-in` over the therading would be that it helps you supply a `not-found` value, the would be returned if the key you are looking for is not there in the collection. Pretty neat huh? Let's try that.
 ```clojure
 (->> (get-in x [:document :paragraph :text] ["No text found"])
      (map #(str % "\n"))
      (reduce str)
      println)
 ```
-Choose which ever works for you.
+
 
 ### Objects
 Now if you are working with java interop and you aren't using the thread-first macro, then this might change your mind.
-Let's take this example, where you have a java object and you apply a series of methods on the javaobject or javaobjects returned on applying these methods. This is how you would be doing it.
+Let's take this example, where you have a java object and you apply a series of methods on the Java object or Java objects returned on applying these methods. This is how you would be doing it.
 ```clojure
 (.add (.getContent (.getBody (.getJaxbelement (.getMaindocumentpart (Wordprocessingmlpackage/createPackage)))) paragraph)
 ```
@@ -95,9 +94,9 @@ Now with thread first this becomes
     .getContent
     (.add paragraph)
 ```
-Which is way more easier to read, and write. It is aligned with the original java representation, which aids in better understanding of the code. It feels less clunkier and neater than the preious case where you could get lost in all those parenthesis.
+Which is way more easier to read, and write. It is aligned with the original java representation, which aids in better understanding of the code. It feels less clunky than the preious case where you could get lost in all those parenthesis.
 
-Since we are at it, let us talk about another function `doto`. This is very helpful when you have to apply multiple funtions on a single java object. We didn't use it in the previous example because, each of the function was returing a different object.
+Since we are at it, let's talk about another function: `doto`. This is very helpful when you have to apply multiple funtions on a single java object. We didn't use it in the previous example because, each of the functions were returing a different object.
 
 Consider you have a table-border object and you want to set border to it. This is how you would be writing with thread the `doto` funtion.
 ```clojure
@@ -113,5 +112,4 @@ Consider you have a table-border object and you want to set border to it. This i
 ```
 You could use the threading operator or even write it in a single line, but it would be messy.
 
-
-This pretty much sums up this blogpost.
+Reading clojure code, you will realise that a lot of peps out there use threading macro and are right in doing so, as code readability is very important. Use them when ever you can, but keep in mind why you are using them. It's not just the `how` that is important, `why` matters too.
