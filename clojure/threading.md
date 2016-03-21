@@ -95,7 +95,7 @@ Now with thread first this becomes
     .getContent
     (.add paragraph)
 ```
-Which is way more easier to read, and write. It is aligned with the original java representation, which aids in better understanding of the code. It feels like clunkier and neater than the preious case where you could get lost in all those parenthesis.
+Which is way more easier to read, and write. It is aligned with the original java representation, which aids in better understanding of the code. It feels less clunkier and neater than the preious case where you could get lost in all those parenthesis.
 
 Since we are at it, let us talk about another function `doto`. This is very helpful when you have to apply multiple funtions on a single java object. We didn't use it in the previous example because, each of the function was returing a different object.
 
