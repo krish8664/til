@@ -1,4 +1,4 @@
-# Lazyness in clojure
+# Lazy sequence in clojure
 
 I was playing arund with the `lazy-seq` that clojure has and began to wonder if the lazy sequence really had an advantage over the non-lazy(_eager_/_realized_) sequence. So I wrote a two functions to generate the first n positive integers, one lazy and the other eager.
 
