@@ -1,6 +1,6 @@
 # Lazy sequence in clojure
 
-I was playing arund with the `lazy-seq` that clojure has and began to wonder if the lazy sequence really had an advantage over the non-lazy(_eager_/_realized_) sequence. So I wrote a two functions to generate the first n positive integers, one lazy and the other eager.
+I was playing arund with the `lazy-seq` that clojure has and began to wonder if the lazy sequence really had an advantage over the non-lazy(_eager_/_realized_) sequence. So I wrote two functions to generate the first n positive integers, one lazy and the other eager.
 
 ```clojure
 (defn lazy-first-n
@@ -38,4 +38,6 @@ I've got x !
 "Elapsed time: 5807.555375 msecs"
 true
 ```
-Here in the first case `take` returns a lazy sequence, but the sequence isn't realized, so the function `foo` runs without ever having to use the argument. Whereas in the second case the `eager-first-n` the function first gets evaluated i.e generate the whole list and only then then function foo is invoked even though we are not using the argument anywhere within the function. This is gives a big advantage when you are working with really large sequences. It is likely there might be cases where we need to use them and cases where we might not need, so by delaying the realization of the list we make sure that it is only realized/evaluated if and only if and when it is needed.
+Here in the first case `take` returns a lazy sequence, but the sequence isn't realized, so the function `foo` runs without ever having to use the argument. Whereas in the second case the `eager-first-n` the function first gets evaluated i.e generate the whole sequence and only then the function foo is invoked, even though we are not using the argument anywhere within the function. This is gives a big advantage when you are working with really large sequences.
+
+It is likely there might be cases where we need to use an argument passed to a function and cases where we might not need (while using conditional statements), so by delaying the realization of the sequence we make sure that it is only realized/evaluated if and only if and when it is needed.
